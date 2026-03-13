@@ -390,7 +390,7 @@ The package creates a `pasha_bank_transactions` table:
 | `approval_code` | string(6) | Approval code (nullable) |
 | `result` | string | RESULT value from bank (nullable) |
 | `result_code` | string(3) | RESULT_CODE from bank (nullable) |
-| `redirect_url` | text | Bank's checkout URL (nullable) |
+| `redirect_url` | string(2048) | Bank's checkout URL (nullable) |
 | `raw_response` | json | API response (nullable) |
 | `paid_at` | timestamp | When payment succeeded (nullable) |
 | `created_at` | timestamp | Record creation time |
@@ -423,7 +423,7 @@ PASHA_BANK_SSL_VERIFY=false
 ./vendor/bin/phpunit
 ```
 
-The package includes 48 tests covering:
+The package includes 52 tests covering:
 - Configuration validation
 - DTO construction, validation, and amount conversion
 - Transaction result parsing (success, failure, timeout, auto-reversal)
