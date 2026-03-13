@@ -82,46 +82,54 @@ class GuzzleHttpClient implements HttpClientInterface
 
     private function createClient(): Client
     {
+        $sslVerify = $this->configuration->getSslVerify();
+
         $options = [
             'timeout' => $this->configuration->getTimeout(),
-            'curl' => [
-                CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-            ],
         ];
 
-        $cert = $this->configuration->getCertificate();
-        $certPassword = $this->configuration->getCertificatePassword();
-        $privateKey = $this->configuration->getPrivateKey();
-        $privateKeyPassword = $this->configuration->getPrivateKeyPassword();
-        $caCert = $this->configuration->getCaCertificate();
+        // Only enforce TLS 1.2 and certificate options when SSL is enabled
+        if ($sslVerify) {
+            $options['curl'] = [
+                CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+            ];
 
-        if (!empty($cert)) {
-            $extension = strtolower(pathinfo($cert, PATHINFO_EXTENSION));
+            $cert = $this->configuration->getCertificate();
+            $certPassword = $this->configuration->getCertificatePassword();
+            $privateKey = $this->configuration->getPrivateKey();
+            $privateKeyPassword = $this->configuration->getPrivateKeyPassword();
+            $caCert = $this->configuration->getCaCertificate();
 
-            if ($extension === 'p12' || $extension === 'pfx') {
-                $options['curl'][CURLOPT_SSLCERT] = $cert;
-                $options['curl'][CURLOPT_SSLCERTTYPE] = 'P12';
-                if (!empty($certPassword)) {
-                    $options['curl'][CURLOPT_SSLCERTPASSWD] = $certPassword;
+            if (!empty($cert)) {
+                $extension = strtolower(pathinfo($cert, PATHINFO_EXTENSION));
+
+                if ($extension === 'p12' || $extension === 'pfx') {
+                    $options['curl'][CURLOPT_SSLCERT] = $cert;
+                    $options['curl'][CURLOPT_SSLCERTTYPE] = 'P12';
+                    if (!empty($certPassword)) {
+                        $options['curl'][CURLOPT_SSLCERTPASSWD] = $certPassword;
+                    }
+                } else {
+                    $options['cert'] = !empty($certPassword)
+                        ? [$cert, $certPassword]
+                        : $cert;
                 }
-            } else {
-                $options['cert'] = !empty($certPassword)
-                    ? [$cert, $certPassword]
-                    : $cert;
             }
-        }
 
-        if (!empty($privateKey)) {
-            $options['ssl_key'] = !empty($privateKeyPassword)
-                ? [$privateKey, $privateKeyPassword]
-                : $privateKey;
-            $options['curl'][CURLOPT_SSLKEYTYPE] = 'PEM';
-        }
+            if (!empty($privateKey)) {
+                $options['ssl_key'] = !empty($privateKeyPassword)
+                    ? [$privateKey, $privateKeyPassword]
+                    : $privateKey;
+                $options['curl'][CURLOPT_SSLKEYTYPE] = 'PEM';
+            }
 
-        if (!empty($caCert)) {
-            $options['verify'] = $caCert;
+            if (!empty($caCert)) {
+                $options['verify'] = $caCert;
+            } else {
+                $options['verify'] = true;
+            }
         } else {
-            $options['verify'] = $this->configuration->getSslVerify();
+            $options['verify'] = false;
         }
 
         return new Client($options);
