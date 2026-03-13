@@ -405,6 +405,18 @@ The package creates a `pasha_bank_transactions` table:
 | `978` | EUR (Euro) |
 | `826` | GBP (Pound Sterling) |
 
+## Local Development
+
+For local testing without a real bank certificate, set `PASHA_BANK_SSL_VERIFY=false` in your `.env`. This disables TLS 1.2 enforcement and certificate requirements, allowing you to test against a local mock server over plain HTTP:
+
+```env
+PASHA_BANK_MERCHANT_HANDLER=http://127.0.0.1:9001/ecomm2/MerchantHandler
+PASHA_BANK_CLIENT_HANDLER=http://127.0.0.1:9001/ecomm2/ClientHandler
+PASHA_BANK_SSL_VERIFY=false
+```
+
+**Never set `ssl_verify=false` in production.**
+
 ## Testing
 
 ```bash
