@@ -24,8 +24,8 @@ class ReturnController extends Controller
         PashaBankServiceInterface $service,
         ConfigurationInterface $configuration,
     ): RedirectResponse {
-        $transactionId = $request->input('trans_id', '');
-        $clientIp = $request->ip();
+        $transactionId = substr((string) $request->input('trans_id', ''), 0, 28);
+        $clientIp = filter_var($request->ip(), FILTER_VALIDATE_IP) ?: '0.0.0.0';
 
         if (empty($transactionId)) {
             Log::warning('Pasha Bank: Return callback with empty trans_id');

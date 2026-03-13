@@ -57,7 +57,7 @@ class PashaBankService implements PashaBankServiceInterface
         ];
 
         if (!empty($request->description)) {
-            $params['description'] = substr($request->description, 0, 125);
+            $params['description'] = $request->description;
         }
 
         $this->logger->info('Pasha Bank: Executing DMS capture', [
@@ -218,7 +218,7 @@ class PashaBankService implements PashaBankServiceInterface
         ];
 
         if (!empty($request->description)) {
-            $params['description'] = substr($request->description, 0, 125);
+            $params['description'] = $request->description;
         }
 
         $params['language'] = $request->language->value;

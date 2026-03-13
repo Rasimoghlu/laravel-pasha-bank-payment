@@ -31,6 +31,10 @@ final readonly class PaymentRequest
         if (empty($this->clientIp)) {
             throw InvalidPaymentException::missingClientIp();
         }
+
+        if (strlen($this->description) > 125) {
+            throw InvalidPaymentException::descriptionTooLong();
+        }
     }
 
     /**
@@ -39,6 +43,6 @@ final readonly class PaymentRequest
      */
     public function getAmountInMinorUnits(): int
     {
-        return (int) bcmul((string) $this->amount, '100', 0);
+        return (int) round((float) bcmul((string) $this->amount, '100', 2));
     }
 }

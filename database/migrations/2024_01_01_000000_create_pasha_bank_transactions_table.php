@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('approval_code', 6)->nullable();
             $table->string('result')->nullable();
             $table->string('result_code', 3)->nullable();
-            $table->text('redirect_url')->nullable();
+            $table->string('redirect_url', 2048)->nullable();
             $table->json('raw_response')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();

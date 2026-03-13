@@ -18,4 +18,9 @@ class InvalidPaymentException extends PashaBankException
     {
         return new self('Client IP address is required.');
     }
+
+    public static function descriptionTooLong(): self
+    {
+        return new self('Description must not exceed 125 characters.');
+    }
 }

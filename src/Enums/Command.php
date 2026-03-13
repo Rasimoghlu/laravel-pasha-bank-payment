@@ -11,9 +11,4 @@ enum Command: string
     case Refund = 'k';
     case TransactionResult = 'c';
     case EndOfBusinessDay = 'b';
-    case RecurringRegisterAuth = 'z';
-    case RecurringRegisterTransaction = 'd';
-    case RecurringRegisterOnly = 'p';
-    case RecurringExecute = 'e';
-    case RecurringDelete = 'x';
 }

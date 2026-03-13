@@ -36,6 +36,6 @@ final readonly class DmsCaptureRequest
 
     public function getAmountInMinorUnits(): int
     {
-        return (int) bcmul((string) $this->amount, '100', 0);
+        return (int) round((float) bcmul((string) $this->amount, '100', 2));
     }
 }
