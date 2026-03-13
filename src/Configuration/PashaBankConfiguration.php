@@ -134,8 +134,13 @@ final readonly class PashaBankConfiguration implements ConfigurationInterface
             'merchant_handler' => $this->merchantHandler,
             'client_handler' => $this->clientHandler,
             'terminal_id' => $this->terminalId,
-            'certificate' => $this->certificate,
+            'success_url' => $this->successUrl,
+            'error_url' => $this->errorUrl,
         ];
+
+        if ($this->sslVerify) {
+            $required['certificate'] = $this->certificate;
+        }
 
         foreach ($required as $key => $value) {
             if (empty($value)) {

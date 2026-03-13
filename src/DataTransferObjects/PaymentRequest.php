@@ -39,6 +39,6 @@ final readonly class PaymentRequest
      */
     public function getAmountInMinorUnits(): int
     {
-        return (int) round($this->amount * 100);
+        return (int) bcmul((string) $this->amount, '100', 0);
     }
 }

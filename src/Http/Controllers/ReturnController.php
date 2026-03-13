@@ -5,6 +5,7 @@ namespace Sarkhanrasimoghlu\PashaBank\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Sarkhanrasimoghlu\PashaBank\Contracts\ConfigurationInterface;
 use Sarkhanrasimoghlu\PashaBank\Contracts\PashaBankServiceInterface;
@@ -28,6 +29,18 @@ class ReturnController extends Controller
 
         if (empty($transactionId)) {
             Log::warning('Pasha Bank: Return callback with empty trans_id');
+
+            return redirect($configuration->getErrorUrl());
+        }
+
+        $transaction = DB::table('pasha_bank_transactions')
+            ->where('transaction_id', $transactionId)
+            ->first();
+
+        if (!$transaction) {
+            Log::warning('Pasha Bank: Return callback with unknown trans_id', [
+                'trans_id' => $transactionId,
+            ]);
 
             return redirect($configuration->getErrorUrl());
         }

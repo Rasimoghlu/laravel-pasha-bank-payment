@@ -21,7 +21,10 @@ class PashaBankServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/pasha-bank.php', 'pasha-bank');
 
         $this->app->singleton(ConfigurationInterface::class, function ($app) {
-            return PashaBankConfiguration::fromArray($app['config']->get('pasha-bank', []));
+            $config = PashaBankConfiguration::fromArray($app['config']->get('pasha-bank', []));
+            $config->validate();
+
+            return $config;
         });
 
         $this->app->singleton(HttpClientInterface::class, function ($app) {

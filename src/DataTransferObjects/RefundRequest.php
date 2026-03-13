@@ -32,6 +32,6 @@ final readonly class RefundRequest
             return null;
         }
 
-        return (int) round($this->amount * 100);
+        return (int) bcmul((string) $this->amount, '100', 0);
     }
 }

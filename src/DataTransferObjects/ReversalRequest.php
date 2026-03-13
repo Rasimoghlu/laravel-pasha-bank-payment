@@ -31,6 +31,6 @@ final readonly class ReversalRequest
             return null;
         }
 
-        return (int) round($this->amount * 100);
+        return (int) bcmul((string) $this->amount, '100', 0);
     }
 }

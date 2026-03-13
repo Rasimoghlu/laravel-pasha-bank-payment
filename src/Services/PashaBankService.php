@@ -275,25 +275,49 @@ class PashaBankService implements PashaBankServiceInterface
         ?string $cardNumber = null,
     ): void {
         try {
-            $update = [
+            DB::transaction(function () use ($transactionId, $status, $response, $cardNumber) {
+                $transaction = DB::table('pasha_bank_transactions')
+                    ->where('transaction_id', $transactionId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$transaction) {
+                    return;
+                }
+
+                $terminalStatuses = ['succeeded', 'reversed', 'refunded'];
+                if (in_array($transaction->status, $terminalStatuses, true)) {
+                    return;
+                }
+
+                $update = [
+                    'status' => $status,
+                    'result' => $response['RESULT'] ?? null,
+                    'result_code' => $response['RESULT_CODE'] ?? null,
+                    'rrn' => $response['RRN'] ?? $transaction->rrn,
+                    'approval_code' => $response['APPROVAL_CODE'] ?? $transaction->approval_code,
+                    'raw_response' => json_encode($response),
+                    'updated_at' => now(),
+                ];
+
+                if ($cardNumber) {
+                    $update['card_number'] = $cardNumber;
+                }
+
+                if ($status === 'succeeded') {
+                    $update['paid_at'] = now();
+                }
+
+                DB::table('pasha_bank_transactions')
+                    ->where('transaction_id', $transactionId)
+                    ->update($update);
+            });
+        } catch (\Throwable $e) {
+            $this->logger->error('Pasha Bank: Failed to sync transaction status', [
+                'trans_id' => $transactionId,
                 'status' => $status,
-                'raw_response' => json_encode($response),
-                'updated_at' => now(),
-            ];
-
-            if ($cardNumber) {
-                $update['card_number'] = $cardNumber;
-            }
-
-            if ($status === 'succeeded') {
-                $update['paid_at'] = now();
-            }
-
-            DB::table('pasha_bank_transactions')
-                ->where('transaction_id', $transactionId)
-                ->update($update);
-        } catch (\Throwable) {
-            // DB not available (unit tests)
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

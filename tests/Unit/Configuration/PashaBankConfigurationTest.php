@@ -110,4 +110,36 @@ class PashaBankConfigurationTest extends TestCase
         $data['client_handler'] = '';
         PashaBankConfiguration::fromArray($data)->validate();
     }
+
+    public function test_validate_fails_without_success_url(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('success_url');
+
+        $data = $this->validConfig();
+        $data['success_url'] = '';
+        PashaBankConfiguration::fromArray($data)->validate();
+    }
+
+    public function test_validate_fails_without_error_url(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('error_url');
+
+        $data = $this->validConfig();
+        $data['error_url'] = '';
+        PashaBankConfiguration::fromArray($data)->validate();
+    }
+
+    public function test_validate_passes_without_certificate_when_ssl_disabled(): void
+    {
+        $data = $this->validConfig();
+        $data['certificate'] = '';
+        $data['ssl_verify'] = false;
+
+        $config = PashaBankConfiguration::fromArray($data);
+        $config->validate();
+
+        $this->assertTrue(true);
+    }
 }
